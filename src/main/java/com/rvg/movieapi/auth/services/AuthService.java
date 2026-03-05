@@ -14,6 +14,18 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+/**
+ * Service responsible for user authentication and registration.
+ * <p>
+ * Handles two core flows:
+ * <ul>
+ *   <li><b>Register:</b> creates a new user, encodes their password, generates
+ *       a JWT access token and a refresh token.</li>
+ *   <li><b>Login:</b> validates credentials via Spring Security's
+ *       {@link AuthenticationManager}, then issues a new access token and
+ *       refresh token for the authenticated user.</li>
+ * </ul>
+ */
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -24,6 +36,21 @@ public class AuthService {
     private final RefreshTokenService refreshTokenService;
     private final AuthenticationManager authenticationManager;
 
+    /**
+     * Registers a new user and returns a token pair.
+     * <p>
+     * Steps:
+     * <ol>
+     *   <li>Build a {@link User} entity from the request, encoding the password with BCrypt.</li>
+     *   <li>Persist the user via {@link UserRepository}.</li>
+     *   <li>Generate a JWT access token for the saved user.</li>
+     *   <li>Create a refresh token associated with the user's email.</li>
+     *   <li>Return both tokens in an {@link AuthResponse}.</li>
+     * </ol>
+     *
+     * @param registerRequest DTO containing name, email, username, and raw password
+     * @return {@link AuthResponse} with accessToken and refreshToken
+     */
     public AuthResponse register(RegisterRequest registerRequest) {
         var user = User.builder()
                 .name(registerRequest.getName())
@@ -43,6 +70,24 @@ public class AuthService {
                 .build();
     }
 
+    /**
+     * Authenticates an existing user and returns a token pair.
+     * <p>
+     * Steps:
+     * <ol>
+     *   <li>Delegate credential validation to {@link AuthenticationManager}.
+     *       Throws {@link org.springframework.security.core.AuthenticationException}
+     *       if credentials are invalid.</li>
+     *   <li>Load the user from the database by email.</li>
+     *   <li>Generate a new JWT access token.</li>
+     *   <li>Create a new refresh token for the user.</li>
+     *   <li>Return both tokens in an {@link AuthResponse}.</li>
+     * </ol>
+     *
+     * @param loginRequest DTO containing email and raw password
+     * @return {@link AuthResponse} with accessToken and refreshToken
+     * @throws UsernameNotFoundException if the email does not exist in the database
+     */
     public AuthResponse login(LoginRequest loginRequest) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(

@@ -9,6 +9,13 @@ import lombok.NoArgsConstructor;
 
 import java.time.Instant;
 
+/**
+ * Entity representing a JWT refresh token.
+ * <p>
+ * Refresh tokens are long-lived credentials used to obtain new access tokens
+ * without requiring the user to re-authenticate. Each user has at most one
+ * active refresh token due to the {@code @OneToOne} relationship.
+ */
 @Entity
 @Builder
 @NoArgsConstructor
