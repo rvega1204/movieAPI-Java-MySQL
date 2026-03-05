@@ -191,7 +191,7 @@ Tests are written with **JUnit 5** and **Mockito**. Coverage includes:
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/movieapi.git
+git clone https://github.com/rvega1204/movieAPI-Java-MySQL.git
 cd movieapi
 
 # Configure application.properties
